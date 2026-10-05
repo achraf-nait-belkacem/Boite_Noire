@@ -46,6 +46,19 @@ public class DataGenerator implements CommandLineRunner  {
             }
         }
 
+        int month = 1 + randomVal.nextInt(12);
+        int day = 1 + randomVal.nextInt(28);
+        int hour;
+        if (randomVal.nextInt(100)<80)
+        {
+            hour = 9 + randomVal.nextInt(10);
+        }
+        else
+        {
+            hour = randomVal.nextInt(24);
+        }
+        int minute = randomVal.nextInt(60);
+        int second = randomVal.nextInt(60);
 
     }
     
