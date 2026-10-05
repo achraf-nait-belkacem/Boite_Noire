@@ -6,15 +6,21 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
 
 //main model representing an event in our mangodb collection using record
+//map our class onto our collection
 
 @Document (collection = "events")
 public record Event(
-    @Id 
+    @Id //convert id into string
     String id,
-    String type,
+    String type, // might better be an enum ?
     String usedId,
-    Instant timestamp,
+    Instant timestamp, // java's type
     Object payload
-) {
-    
+) 
+{
+
+    public Event (String type, String userId, Instant timestamp, Object payload)    
+    {
+        this (null, type, userId, timestamp, payload);
+    }
 }
