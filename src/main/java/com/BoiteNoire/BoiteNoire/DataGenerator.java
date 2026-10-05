@@ -60,6 +60,22 @@ public class DataGenerator implements CommandLineRunner  {
         int minute = randomVal.nextInt(60);
         int second = randomVal.nextInt(60);
 
+        Instant timestamp = LocalDate.of(2026, month, day, hour, minute, second).toInstant(ZoneOffset.UTC); //convert and savedate to UTC formazt used by mongo
+
+        //type of events
+        int typeRandom =  randomVal.nextInt(100); 
+        Event event;
+
+
+        if (typeRandom < 50) 
+        {
+            //50% of events API
+            int duration = 50 + randomVal.nextInt(100);
+            if (randomVal.nextInt(100)<5)
+            {
+                
+            }
+        }
     }
     
 }
