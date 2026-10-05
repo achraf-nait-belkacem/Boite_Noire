@@ -13,7 +13,7 @@ public record Event(
     @Id //convert id into string
     String id,
     String type, // might better be an enum ?
-    String usedrId,
+    String userId,
     Instant timestamp, // java's type
     Object payload
 ) 
