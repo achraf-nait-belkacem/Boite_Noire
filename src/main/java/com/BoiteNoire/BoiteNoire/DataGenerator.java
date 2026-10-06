@@ -37,17 +37,17 @@ public class DataGenerator implements CommandLineRunner
 
 
 
-        for (int i = 1; i <= 100000; i++)
+        for (int i = 1; i <= 1000000; i++)
         {
             //proba big/small user
             String userId;
             if (randomVal.nextInt(100) < 70 ) 
             {
-                userId = "user" + (1 + randomVal.nextInt(10)); //our ten biggest users
+                userId = "user" + (1 + randomVal.nextInt(100)); //our ten biggest users
             }
             else
             {
-                userId = "user" + (11 + randomVal.nextInt(500));
+                userId = "user" + (11 + randomVal.nextInt(4000));
             }
         
 
