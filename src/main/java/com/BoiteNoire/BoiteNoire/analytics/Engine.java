@@ -1,15 +1,18 @@
 package com.BoiteNoire.BoiteNoire.analytics;
 
 import com.BoiteNoire.BoiteNoire.analytics.TopUser;
+import com.BoiteNoire.BoiteNoire.analytics.ErrorTypeDate;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.DateOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.format.annotation.DateTimeFormat; 
 import org.springframework.web.bind.annotation.GetMapping; 
 import org.springframework.web.bind.annotation.RequestMapping; 
 import org.springframework.web.bind.annotation.RequestParam;   
-import org.springframework.web.bind.annotation.RestController;   
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.tags.ArgumentAware;
 
 import java.time.Instant;
 import java.util.List;
@@ -44,5 +47,19 @@ public class Engine
             Aggregation.limit(100)//top 100 no need to change 
         );
         return  mongoTemplate.aggregate(aggregation, "events", TopUser.class).getMappedResults();
+    }
+
+    @GetMapping("/errors-by-day")
+    public List<ErrorTypeDate> getErrorsByDay(@RequestParam @DateTimeFormat (iso = DateTimeFormat.ISO.DATE_TIME) Instant beginDate, @RequestParam @DateTimeFormat (iso  = DateTimeFormat.ISO.DATE_TIME) Instant endDate)
+    {
+        Aggregation aggregation = Aggregation.newAggregation
+        (
+            Aggregation.match(Criteria.where("type").is("ERROR").and("timestamp").gte(beginDate).lte(endDate)),
+            Aggregation.project("payload.errorType").and(DateOperators.dateOf("timestamp").toString("%Y-%m-%d")).as("day"),
+            Aggregation.group("day", "errorType").count().as("count"),
+            Aggregation.project("count").and("_id.day").as("day").and("_id.errorType").as("errorType"),
+            Aggregation.sort(Sort.Direction.ASC, "day")
+        );
+        return mongoTemplate.aggregate(aggregation, "events", ErrorTypeDate.class).getMappedResults();
     }
 }
