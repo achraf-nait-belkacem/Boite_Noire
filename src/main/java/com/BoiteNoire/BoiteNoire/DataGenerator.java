@@ -93,8 +93,15 @@ public class DataGenerator implements CommandLineRunner  {
         else event = new Event("PAYMENT", userId, timestamp, new PaymentPayload(19.99, "EUR", "PRO", "SUCCESS"));
 
         batchEvents.add(event); //
-
+        if (batchEvents.size() == 4000) //must add fail safe if x / y != 0 .isempty ?
+        {
+            mongoTemplate.insertAll(batchEvents);
+            batchEvents.clear();
+            System.out.println("generated data :" + i);
         }
+        }
+        System.err.println("succed");
+        System.exit(0);
     }
     
 }
