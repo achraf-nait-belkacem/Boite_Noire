@@ -50,6 +50,7 @@ public class Engine
     }
 
     @GetMapping("/errors-by-day")
+    //filters and count errors by type for each day on a given period of time
     public List<ErrorTypeDate> getErrorsByDay(@RequestParam @DateTimeFormat (iso = DateTimeFormat.ISO.DATE_TIME) Instant beginDate, @RequestParam @DateTimeFormat (iso  = DateTimeFormat.ISO.DATE_TIME) Instant endDate)
     {
         Aggregation aggregation = Aggregation.newAggregation
