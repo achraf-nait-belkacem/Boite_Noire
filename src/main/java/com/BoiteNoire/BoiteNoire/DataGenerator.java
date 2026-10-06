@@ -44,7 +44,7 @@ public class DataGenerator implements CommandLineRunner  {
             {
                 userId = "user" + (11 + randomVal.nextInt(500));
             }
-        }
+        
 
         int month = 1 + randomVal.nextInt(12);
         int day = 1 + randomVal.nextInt(28);
@@ -60,7 +60,7 @@ public class DataGenerator implements CommandLineRunner  {
         int minute = randomVal.nextInt(60);
         int second = randomVal.nextInt(60);
 
-        Instant timestamp = LocalDate.of(2026, month, day, hour, minute, second).toInstant(ZoneOffset.UTC); //convert and savedate to UTC formazt used by mongo
+        Instant timestamp = LocalDateTime.of(2026, month, day, hour, minute, second).toInstant(ZoneOffset.UTC); //convert and savedate to UTC formazt used by mongo
 
         //type of events
         int typeRandom =  randomVal.nextInt(100); 
@@ -71,10 +71,29 @@ public class DataGenerator implements CommandLineRunner  {
         {
             //50% of events API
             int duration = 50 + randomVal.nextInt(100);
+            //5 percent slow api call
             if (randomVal.nextInt(100)<5)
             {
-                
+                duration = 1000 + randomVal.nextInt(1000);
             }
+            event = new Event("API_CALL", userId, timestamp, new ApiCallPayload("/messages", "POST", duration, 200));
+        }
+        else if (typeRandom < 70) 
+        {
+            event = new Event("LOGIN", userId, timestamp, new LoginPayload("192.168.1." + randomVal.nextInt(255), "desktop", true));
+        }
+        else if (typeRandom < 85) 
+        {
+            event = new Event("NOTIFICATION", userId, timestamp, new NotificationPayload("push", "new message", false));
+        }
+        else if (typeRandom < 95) 
+        {
+            event = new Event("ERROR", userId, timestamp, new ErrorPayload("messaging", "connexion error", "HIGH", "TIMEOUT"));
+        }
+        else event = new Event("PAYMENT", userId, timestamp, new PaymentPayload(19.99, "EUR", "PRO", "SUCCESS"));
+
+        batchEvents.add(event); //
+
         }
     }
     
