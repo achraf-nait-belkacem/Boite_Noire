@@ -1,4 +1,4 @@
-# 📦 Projet Boîte Noire (Pigeon)
+# Projet Boîte Noire (Pigeon)
 
 Service Spring Boot d'ingestion et d'analyse de journaux d'événements (logs) couplé à une base documentaire **MongoDB**.
 
@@ -97,7 +97,7 @@ Exemple de test pour une période annuelle :
 
 ---
 
-## 📊 5. Endpoints d'analyse disponibles (`/api/analytics`)
+## 5. Endpoints d'analyse disponibles (`/api/analytics`)
 
 * **`GET /api/analytics/top-users`** : Top des utilisateurs les plus actifs sur une période donnée en paramètre.
 * **`GET /api/analytics/errors-by-day`** : Répartition et décompte des erreurs par type et par jour sur une période.
