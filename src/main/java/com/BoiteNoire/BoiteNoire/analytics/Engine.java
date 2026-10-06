@@ -31,15 +31,18 @@ public class Engine
     @GetMapping ("/top-users")
     //iso date is 2026-10-01T00:00:00Z
     //GET /top-users?beginDate=2026-10-01T08:00:00Z&endDate=2026-10-06T18:00:00Z
+    //2026-01-01T00:00:00Z
+    //2026-12-31T23:59:59Z
     public List<TopUser> getTopUsers(@RequestParam @DateTimeFormat (iso = DateTimeFormat.ISO.DATE_TIME) Instant beginDate, @RequestParam @DateTimeFormat (iso  = DateTimeFormat.ISO.DATE_TIME) Instant endDate)
     {
         Aggregation aggregation = Aggregation.newAggregation
         (
             Aggregation.match(Criteria.where("timestamp").gte(beginDate).lte(endDate)),
             Aggregation.group("userId").count().as("count"),
-            Aggregation.project("count").and("_id").as("userId"),
+            Aggregation.project("count").and("_id").as("userId"), //restruct and add a numvalue to the userId
             Aggregation.sort(Sort.Direction.DESC, "count"),
             Aggregation.limit(100)//top 100 no need to change 
-        )
+        );
+        return  mongoTemplate.aggregate(aggregation, "events", TopUser.class).getMappedResults();
     }
 }
