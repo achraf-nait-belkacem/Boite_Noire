@@ -16,7 +16,8 @@ import java.util.Random;
 @Profile ("generator") //only launches if we launch said profile
 
 //add run() method from spring
-public class DataGenerator implements CommandLineRunner  {
+public class DataGenerator implements CommandLineRunner  
+{
     private final MongoTemplate mongoTemplate; //ref mongodb util
     
     public DataGenerator(MongoTemplate mongoTemplate) //spring inject mongotemplate into app
@@ -31,6 +32,10 @@ public class DataGenerator implements CommandLineRunner  {
         Random randomVal = new Random();
         List<Event> batchEvents = new ArrayList<>();
         mongoTemplate.dropCollection("events"); //should be empty anyways
+
+
+
+
 
         for (int i = 1; i <= 100000; i++)
         {
@@ -76,7 +81,10 @@ public class DataGenerator implements CommandLineRunner  {
             {
                 duration = 1000 + randomVal.nextInt(1000);
             }
-            event = new Event("API_CALL", userId, timestamp, new ApiCallPayload("/messages", "POST", duration, 200));
+            //added for event variety
+            String[] endpoints = {"/messages", "/conversations", "/users"};
+            String endpoint = endpoints[randomVal.nextInt(endpoints.length)];
+            event = new Event("API_CALL", userId, timestamp, new ApiCallPayload(endpoint, "POST", duration, 200));
         }
         else if (typeRandom < 70) 
         {
@@ -88,7 +96,10 @@ public class DataGenerator implements CommandLineRunner  {
         }
         else if (typeRandom < 95) 
         {
-            event = new Event("ERROR", userId, timestamp, new ErrorPayload("messaging", "connexion error", "HIGH", "TIMEOUT"));
+            //added for variety
+            String[] errors = {"TIMEOUT", "DATABASE_ERROR", "AUTH_ERROR"};
+            String errorType = errors[randomVal.nextInt(errors.length)];
+            event = new Event("ERROR", userId, timestamp, new ErrorPayload("messaging", "connexion error", "HIGH", errorType));
         }
         else event = new Event("PAYMENT", userId, timestamp, new PaymentPayload(19.99, "EUR", "PRO", "SUCCESS"));
 
