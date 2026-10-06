@@ -63,4 +63,35 @@ public class Engine
         );
         return mongoTemplate.aggregate(aggregation, "events", ErrorTypeDate.class).getMappedResults();
     }
+
+    //slowest endpoint
+    @GetMapping("/endpoint-performance") 
+    public List<EndpointData> getEndpointPerformance() {
+        Aggregation aggregation = Aggregation.newAggregation
+        (Aggregation.match(Criteria.where("type").is("API_CALL")),
+        //calculate average and p96 using mongo syntax
+            context -> org.bson.Document.parse("""
+                {
+                $group: {
+                _id: "$payload.endpoint",
+                averageDuration: { $avg: "$payload.durationMs" },
+                p95Duration: { $percentile: { input: "$payload.durationMs", p: [0.95], method: "approximate" } }
+                }
+            }
+            """),
+            //our syntax
+            context -> org.bson.Document.parse("""
+                {
+                $project: { 
+                endpoint: "$_id",
+                averageDuration: { $round: ["$averageDuration", 2] },
+                p95Duration: { $arrayElemAt: ["$p95Duration", 0] }
+            }
+            }
+            """)
+        );
+        return mongoTemplate.aggregate(aggregation, "events", EndpointData.class).getMappedResults();
+    }
+
+
 }
