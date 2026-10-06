@@ -1,0 +1,402 @@
+{
+  "query": "GET /api/analytics/latency",
+  "period": "2025-10-05 to 2026-10-04 (UTC, full year)",
+  "indexes": [
+    "_id_"
+  ],
+  "explainRunsMs": [
+    159,
+    158,
+    143
+  ],
+  "medianSummary": {
+    "access": [
+      "COLLSCAN"
+    ],
+    "totalDocsExamined": 149997,
+    "totalKeysExamined": 0,
+    "nReturnedCursor": 82881,
+    "executionTimeMillis": 158
+  },
+  "pipeline": [
+    {
+      "$match": {
+        "$and": [
+          {
+            "timestamp": {
+              "$gte": {
+                "$date": "2025-10-05T00:00:00Z"
+              },
+              "$lt": {
+                "$date": "2026-10-05T00:00:00Z"
+              }
+            }
+          },
+          {
+            "type": "API_CALL"
+          }
+        ]
+      }
+    },
+    {
+      "$group": {
+        "_id": {
+          "endpoint": "$payload.endpoint",
+          "method": "$payload.method"
+        },
+        "count": {
+          "$sum": 1
+        },
+        "avgMs": {
+          "$avg": "$payload.durationMs"
+        },
+        "p95": {
+          "$percentile": {
+            "input": "$payload.durationMs",
+            "p": [
+              0.95
+            ],
+            "method": "approximate"
+          }
+        },
+        "maxMs": {
+          "$max": "$payload.durationMs"
+        }
+      }
+    },
+    {
+      "$project": {
+        "count": 1,
+        "avgMs": 1,
+        "maxMs": 1,
+        "p95Ms": {
+          "$arrayElemAt": [
+            "$p95",
+            0
+          ]
+        }
+      }
+    },
+    {
+      "$sort": {
+        "p95Ms": -1,
+        "_id.endpoint": 1,
+        "_id.method": 1
+      }
+    }
+  ],
+  "explain": {
+    "explainVersion": "1",
+    "stages": [
+      {
+        "$cursor": {
+          "queryPlanner": {
+            "namespace": "pigeon.events",
+            "parsedQuery": {
+              "$and": [
+                {
+                  "type": {
+                    "$eq": "API_CALL"
+                  }
+                },
+                {
+                  "timestamp": {
+                    "$lt": {
+                      "$date": "2026-10-05T00:00:00Z"
+                    }
+                  }
+                },
+                {
+                  "timestamp": {
+                    "$gte": {
+                      "$date": "2025-10-05T00:00:00Z"
+                    }
+                  }
+                }
+              ]
+            },
+            "indexFilterSet": false,
+            "queryHash": "EB68DE4C",
+            "planCacheShapeHash": "EB68DE4C",
+            "planCacheKey": "11A481A4",
+            "optimizationTimeMillis": 0,
+            "maxIndexedOrSolutionsReached": false,
+            "maxIndexedAndSolutionsReached": false,
+            "maxScansToExplodeReached": false,
+            "prunedSimilarIndexes": false,
+            "winningPlan": {
+              "isCached": false,
+              "stage": "PROJECTION_DEFAULT",
+              "transformBy": {
+                "payload.durationMs": 1,
+                "payload.endpoint": 1,
+                "payload.method": 1,
+                "_id": 0
+              },
+              "inputStage": {
+                "stage": "COLLSCAN",
+                "filter": {
+                  "$and": [
+                    {
+                      "type": {
+                        "$eq": "API_CALL"
+                      }
+                    },
+                    {
+                      "timestamp": {
+                        "$lt": {
+                          "$date": "2026-10-05T00:00:00Z"
+                        }
+                      }
+                    },
+                    {
+                      "timestamp": {
+                        "$gte": {
+                          "$date": "2025-10-05T00:00:00Z"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "direction": "forward"
+              }
+            },
+            "rejectedPlans": []
+          },
+          "executionStats": {
+            "executionSuccess": true,
+            "nReturned": 82881,
+            "executionTimeMillis": 158,
+            "totalKeysExamined": 0,
+            "totalDocsExamined": 149997,
+            "executionStages": {
+              "isCached": false,
+              "stage": "PROJECTION_DEFAULT",
+              "nReturned": 82881,
+              "executionTimeMillisEstimate": 57,
+              "works": 149998,
+              "advanced": 82881,
+              "needTime": 67116,
+              "needYield": 0,
+              "saveState": 19,
+              "restoreState": 19,
+              "isEOF": 1,
+              "transformBy": {
+                "payload.durationMs": 1,
+                "payload.endpoint": 1,
+                "payload.method": 1,
+                "_id": 0
+              },
+              "inputStage": {
+                "stage": "COLLSCAN",
+                "filter": {
+                  "$and": [
+                    {
+                      "type": {
+                        "$eq": "API_CALL"
+                      }
+                    },
+                    {
+                      "timestamp": {
+                        "$lt": {
+                          "$date": "2026-10-05T00:00:00Z"
+                        }
+                      }
+                    },
+                    {
+                      "timestamp": {
+                        "$gte": {
+                          "$date": "2025-10-05T00:00:00Z"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "nReturned": 82881,
+                "executionTimeMillisEstimate": 45,
+                "works": 149998,
+                "advanced": 82881,
+                "needTime": 67116,
+                "needYield": 0,
+                "saveState": 19,
+                "restoreState": 19,
+                "isEOF": 1,
+                "direction": "forward",
+                "docsExamined": 149997
+              }
+            }
+          }
+        },
+        "nReturned": 82881,
+        "executionTimeMillisEstimate": 95
+      },
+      {
+        "$group": {
+          "_id": {
+            "endpoint": "$payload.endpoint",
+            "method": "$payload.method"
+          },
+          "count": {
+            "$sum": {
+              "$const": 1
+            }
+          },
+          "avgMs": {
+            "$avg": "$payload.durationMs"
+          },
+          "p95": {
+            "$percentile": {
+              "input": "$payload.durationMs",
+              "p": [
+                0.95
+              ],
+              "method": "approximate"
+            }
+          },
+          "maxMs": {
+            "$max": "$payload.durationMs"
+          }
+        },
+        "maxAccumulatorMemoryUsageBytes": {
+          "count": 1024,
+          "avgMs": 832,
+          "p95": 710432,
+          "maxMs": 576
+        },
+        "totalOutputDataSizeBytes": 5249,
+        "usedDisk": false,
+        "spills": 0,
+        "spilledDataStorageSize": 0,
+        "numBytesSpilledEstimate": 0,
+        "spilledRecords": 0,
+        "nReturned": 8,
+        "executionTimeMillisEstimate": 159
+      },
+      {
+        "$project": {
+          "_id": true,
+          "count": true,
+          "avgMs": true,
+          "maxMs": true,
+          "p95Ms": {
+            "$arrayElemAt": [
+              "$p95",
+              {
+                "$const": 0
+              }
+            ]
+          }
+        },
+        "nReturned": 8,
+        "executionTimeMillisEstimate": 159
+      },
+      {
+        "$sort": {
+          "sortKey": {
+            "p95Ms": -1,
+            "_id.endpoint": 1,
+            "_id.method": 1
+          }
+        },
+        "totalDataSizeSortedBytesEstimate": 5682,
+        "usedDisk": false,
+        "spills": 0,
+        "spilledDataStorageSize": 0,
+        "nReturned": 8,
+        "executionTimeMillisEstimate": 159
+      }
+    ],
+    "queryShapeHash": "8EE22C53C5A6DFFB72CBFCAA0C6C907901D3B5B4E91266513894855BFF7718EA",
+    "serverInfo": {
+      "host": "achrafoonb",
+      "port": 27017,
+      "version": "8.0.32",
+      "gitVersion": "f9eb55a7cc900f33a722a5b32a0fdbf54385c749"
+    },
+    "serverParameters": {
+      "internalQueryFacetBufferSizeBytes": 104857600,
+      "internalQueryFacetMaxOutputDocSizeBytes": 104857600,
+      "internalLookupStageIntermediateDocumentMaxSizeBytes": 104857600,
+      "internalDocumentSourceGroupMaxMemoryBytes": 104857600,
+      "internalQueryMaxBlockingSortMemoryUsageBytes": 104857600,
+      "internalQueryProhibitBlockingMergeOnMongoS": 0,
+      "internalQueryMaxAddToSetBytes": 104857600,
+      "internalDocumentSourceSetWindowFieldsMaxMemoryBytes": 104857600,
+      "internalQueryFrameworkControl": "trySbeRestricted",
+      "internalQueryPlannerIgnoreIndexWithCollationForRegex": 1
+    },
+    "command": {
+      "aggregate": "events",
+      "pipeline": [
+        {
+          "$match": {
+            "$and": [
+              {
+                "timestamp": {
+                  "$gte": {
+                    "$date": "2025-10-05T00:00:00Z"
+                  },
+                  "$lt": {
+                    "$date": "2026-10-05T00:00:00Z"
+                  }
+                }
+              },
+              {
+                "type": "API_CALL"
+              }
+            ]
+          }
+        },
+        {
+          "$group": {
+            "_id": {
+              "endpoint": "$payload.endpoint",
+              "method": "$payload.method"
+            },
+            "count": {
+              "$sum": 1
+            },
+            "avgMs": {
+              "$avg": "$payload.durationMs"
+            },
+            "p95": {
+              "$percentile": {
+                "input": "$payload.durationMs",
+                "p": [
+                  0.95
+                ],
+                "method": "approximate"
+              }
+            },
+            "maxMs": {
+              "$max": "$payload.durationMs"
+            }
+          }
+        },
+        {
+          "$project": {
+            "count": 1,
+            "avgMs": 1,
+            "maxMs": 1,
+            "p95Ms": {
+              "$arrayElemAt": [
+                "$p95",
+                0
+              ]
+            }
+          }
+        },
+        {
+          "$sort": {
+            "p95Ms": -1,
+            "_id.endpoint": 1,
+            "_id.method": 1
+          }
+        }
+      ],
+      "cursor": {},
+      "$db": "pigeon"
+    },
+    "ok": 1
+  }
+}
