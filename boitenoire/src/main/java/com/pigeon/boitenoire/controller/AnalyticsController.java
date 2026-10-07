@@ -16,7 +16,6 @@ import com.pigeon.boitenoire.dto.TopUserResponse;
 import com.pigeon.boitenoire.exception.ErrorResponse;
 import com.pigeon.boitenoire.exception.InvalidRequestException;
 import com.pigeon.boitenoire.service.AnalyticsService;
-import com.pigeon.boitenoire.service.TimeRange;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -55,7 +54,7 @@ public class AnalyticsController {
         if (limit < 1 || limit > MAX_LIMIT) {
             throw new InvalidRequestException("Parameter 'limit' must be between 1 and " + MAX_LIMIT);
         }
-        return analyticsService.topUsers(TimeRange.of(from, to), limit);
+        return analyticsService.topUsers(from, to, limit);
     }
 
     @Operation(summary = "Errors by day, service and message",
@@ -67,7 +66,7 @@ public class AnalyticsController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @Parameter(description = "Last day of the period, inclusive (UTC, yyyy-MM-dd)", example = "2026-03-31")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        return analyticsService.errors(TimeRange.of(from, to));
+        return analyticsService.errors(from, to);
     }
 
     @Operation(summary = "Response time per endpoint",
@@ -80,7 +79,7 @@ public class AnalyticsController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @Parameter(description = "Last day of the period, inclusive (UTC, yyyy-MM-dd); optional", example = "2026-03-31")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        return analyticsService.latency(TimeRange.of(from, to));
+        return analyticsService.latency(from, to);
     }
 
     @Operation(summary = "Conversion funnel",
@@ -93,6 +92,6 @@ public class AnalyticsController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @Parameter(description = "Last day of the period, inclusive (UTC, yyyy-MM-dd)", example = "2026-03-31")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        return analyticsService.funnel(TimeRange.of(from, to));
+        return analyticsService.funnel(from, to);
     }
 }
