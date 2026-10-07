@@ -66,9 +66,6 @@ db.events.countDocuments()
 
 // Voir un exemple de document
 db.events.findOne()
-
-// Consulter les premiers documents
-db.events.find().limit(5)
 ```
 
 ---
